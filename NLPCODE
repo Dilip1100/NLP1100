@@ -1,0 +1,33 @@
+from transformers import pipeline
+import pandas as pd
+
+# Load the sentiment analysis pipeline
+classifier = pipeline("sentiment-analysis")
+
+# Assuming you have a DataFrame named 'data' with a column named 'reviews.text' containing the text data
+# Remove rows with null values in the 'reviews.text' column
+data = data.dropna(subset=['reviews.text'])
+
+# Process only the first 1000 records
+data = data.head(1000)
+
+# Create an empty list to store the sentiments
+sentiments = []
+
+# Iterate over the rows of the DataFrame
+for index, row in data.iterrows():
+    # Truncate or split the text if its length exceeds the maximum sequence length
+    text = row['reviews.text'][:512]  # Truncate to first 512 characters
+    
+    # Apply the sentiment analysis pipeline to the truncated text
+    result = classifier(text)[0]
+    sentiment_label = result['label']
+    
+    # Append the sentiment label to the list
+    sentiments.append(sentiment_label)
+
+# Add the 'sentiment' column to the DataFrame
+data['sentiment'] = sentiments
+
+# Display the DataFrame with the added 'sentiment' column
+print(data[['reviews.text', 'sentiment']])
