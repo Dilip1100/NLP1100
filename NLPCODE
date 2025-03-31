@@ -4,9 +4,12 @@ import pandas as pd
 # Load the sentiment analysis pipeline
 classifier = pipeline("sentiment-analysis")
 
-# Assuming you have a DataFrame named 'data' with a column named 'reviews.text' containing the text data
-# Remove rows with null values in the 'reviews.text' column
-data = data.dropna(subset=['reviews.text'])
+# Load the dataset
+file_path = "/content/REV.csv"
+data = pd.read_csv(file_path)
+
+# Ensure 'REV_TITLE' column is used for sentiment analysis
+data = data.dropna(subset=['REV_TITLE'])
 
 # Process only the first 1000 records
 data = data.head(1000)
@@ -17,12 +20,12 @@ sentiments = []
 # Iterate over the rows of the DataFrame
 for index, row in data.iterrows():
     # Truncate or split the text if its length exceeds the maximum sequence length
-    text = row['reviews.text'][:512]  # Truncate to first 512 characters
-    
+    text = row['REV_TITLE'][:512]  # Truncate to first 512 characters
+
     # Apply the sentiment analysis pipeline to the truncated text
     result = classifier(text)[0]
     sentiment_label = result['label']
-    
+
     # Append the sentiment label to the list
     sentiments.append(sentiment_label)
 
@@ -30,4 +33,4 @@ for index, row in data.iterrows():
 data['sentiment'] = sentiments
 
 # Display the DataFrame with the added 'sentiment' column
-print(data[['reviews.text', 'sentiment']])
+print(data[['REV_TITLE', 'sentiment', 'USR_NAME']])
